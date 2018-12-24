@@ -1,0 +1,211 @@
+JavaScript的事件机制：
+
+一、事件流（捕获，冒泡）
+事件流：指从页面中接收事件的顺序，有冒泡流和捕获流。
+当页面中发生某种事件（比如鼠标点击，鼠标滑过等）时，毫无疑问子元素和父元素都会接收到该事件，
+可具体顺序是怎样的呢？冒泡和捕获则描述了两种不同的顺序。
+冒泡:从当前触发事件的元素层层向上传递。捕获:从Window对象层层向下传递。
+假如我们点击一个div, 实际上是先点击document，然后点击事件传递到div,而且并不会在这个div就停下，
+div有子元素就还会向下传递，最后又会冒泡传递回document
+为了兼容更多的浏览器，非特殊情况一般我们都是把事件添加到在事件冒泡阶段。
+
+二、事件处理程序
+
+DOM0级事件处理程序:
+var btn5 = document.getElementById('btn5');
+btn5.onclick=function(){
+    console.log(this.id);//btn5   
+};
+注意：基于DOM0的事件，对于同一个dom节点而言，只能注册一个，后边注册的 同种事件 会覆盖之前注册的。this为绑定事件的元素。
+以这种方式添加的事件处理程序会在事件流的冒泡阶段被处理；
+
+DOM2级事件处理程序：
+DOM2支持同一dom元素注册多个同种事件，事件发生的顺序按照添加的顺序依次触发（IE是相反的）。
+DOM2事件通过addEventListener和removeEventListener管理
+//addEventListener(eventName,handlers,boolean);removeEventListener(),
+两个方法都一样接收三个参数,第一个是要处理的事件名,第二个是事件处理程序,
+第三个值为false时表示在事件冒泡阶段调用事件处理程序、为true则表示在事件捕获阶段调用事件处理程序,
+一般建议在冒泡阶段使用,特殊情况才在捕获阶段;
+注意：通过addEventListener()添加的事件处理程序只能用removeEventListener()来移除，
+并且移除时传入的参数必须与添加时传入的参数一样；比如
+var btn2 = document.getElementById('btn2');
+var handlers = function () {
+    console.log(this.id);
+}; 
+btn2.addEventListener('click',handlers,false); 
+btn2.removeEventListener('click',handlers.false);
+
+IE事件处理程序：
+//IE用了attachEvent(),detachEvent(),接收两个参数,事件名称和事件处理程序,
+通过attachEvent()添加的事件处理程序都会被添加到冒泡阶段,
+所以平时为了兼容更多的浏览器最好将事件添加到事件冒泡阶段,IE8及以前只支持事件冒泡;
+var btn3 = document.getElementById('btn3');
+var handlers2=function(){
+   console.log(this===window);//true,注意attachEvent()添加的事件处理程序运行在全局作用域中;
+};
+btn3.attachEvent('onclick',handlers2);
+
+跨浏览器事件处理程序：
+ //创建的方法是addHandlers(),removeHandlers(),这两个方法属于一个叫EventUtil的对象;
+ 但是这个没有考虑到IE中作用域的问题，不过就添加和移除事件还是足够的。
+  
+ var EventUtil = {
+    addHandlers: function (element, type, handlers) {
+       if (element.addEventListener) {
+          element.addEventListener(type, handlers, false);
+       } else if (element.attachEvent) {
+          element.attachEvent(on + type, handlers);
+       } else {
+          element['on' + type] = handlers;
+       }
+    },
+    removeHandlers: function (element, type, handlers) {
+       if (element.removeEventListener) {
+          element.removeEventListener(type, handlers, false);
+       } else if (element.detachEvent) {
+          element.detachEvent(on + type, handlers);
+       } else {
+          element['on' + type] = null;
+       }
+    }
+ };
+ //调用
+var btn4=document.getElementById('btn4');
+ var handlers3=function(){
+    console.log('123')
+ };
+ EventUtil.addHandlers(btn4,'click',handlers3);
+ //……
+ EventUtil.removeHandlers(btn4,'click',handlers3); 
+ 在同一个对象上注册事件，并不一定按照注册顺序执行，冒泡或捕获模式会影响其被触发的顺序；
+
+ 三、事件对象
+ 兼容触发DOM上的某个事件时，会产生一个事件对象event，这个对象中包含了所有与事件有关的信息，
+ 比如导致事件的元素target，事件的类型，及其他特定的相关信息。
+ 例如鼠标操作导致的事件对象中会包含鼠标的位置，单双击等，而键盘操作导致的事件对象会包含按下的键等信息；
+ 
+事件被触发时，会默认给事件处理程序传入一个参数e , 表示事件对象；通过e，我们可以获得其中包含的与事件有关的信息；
+ 
+只有在事件处理程序执行期间，event对象才会存在，一旦事件处理程序执行完毕，event对象就会被销毁；
+
+DOM中的事件对象：
+兼容DOM的浏览器会自动将一个事件对象event传递给事件处理程序
+
+ps:关于事件对象中的this，target，currentTarget,看个例子：（注：event.target不支持IE浏览器，应该用
+event.srcElement；还有 IE中通过attachment添加的事件是运行在全局作用域中的，this===window）
+
+当事件绑定在真正的目标元素上时，this===target===currentTarget ,
+而且绑定事件时是否捕获结果都是一样的，此时eventParse==2;
+
+ //this,target,currentTarget,this===currentTarget
+ $('#outer').on('click','#center',function(e){
+    console.log(this.id);//on()中间的参数是个过滤器,相当于将事件绑定到了#center上;此时点击#center将不会触发事件
+    console.log(e.target.id);
+    console.log(e.currentTarget.id);
+ });
+ 
+ $('#outer').on('click',function(e){
+    console.log(this.id);
+    console.log(e.target.id);
+    console.log(e.currentTarget.id);
+ });
+  
+ event.stopPropagation()不能简单说阻止了事件的冒泡，其实也阻止了事件的继续捕获，确切的说应该是阻止事件的进一步传播
+  
+ var d1 = document.getElementById('d1');
+ d1.addEventListener('click', function (evt) {
+     console.log('d1');
+     evt.stopPropagation();
+ }, true);
+ var d2 = document.getElementById('d2');
+ d2.addEventListener('click', function () {
+     console.log('d2');
+ }, true);
+
+
+ IE中的事件对象：
+ IE中event参数是未定的，事件对象是作为window的一个属性存在的，
+ 因此可以通过window.event来访问event对象，不同于DOM级中event是作为参数直接传入和返回；
+
+ 跨浏览器的事件对象：
+var EventUtil = {
+    addHandler: function (element, type, handler) {
+        if (element.addEventListener) {
+            element.addEventListener(type, handler, false);
+        } else if (element.attachEvent) {
+            element.attachEvent(on + type, handler);
+        } else {
+            element['on' + type] = handler;
+        }
+    },
+
+    getEvent: function (event) {
+        return event ? event : window.event;
+
+    },
+
+    getTarget: function (event) {
+        return event.target || event.srcElement;
+    },
+
+    preventDefault: function (event) {
+        if (event.preventDefault) {
+            event.preventDefault();
+        } else {
+            event.returnValue = false;
+        }
+    },
+
+    stopPropagation: function (event) {
+        if (event.stopPropagation) {
+            event.stopPropagation();
+        } else {
+            event.cancelBubble = true;
+        }
+    },
+
+    removeHandler: function (element, type, handler) {
+        if (element.removeEventListener) {
+            element.removeEventListener(type, handler, false);
+        } else if (element.detachEvent) {
+            element.detachEvent(on + type, handler);
+        } else {
+            element['on' + type] = null
+        }
+    }
+   
+};
+调用:
+var myBtn=document.getElementById('my-btn');
+btn.onclick=function(event){
+    event=EventUtil.getEvent(event);
+    EventUtil.preventDefault(event);
+};
+必须要假设有一个事件对象event传入了事件处理程序中，
+要使用EventUtil中的方法需要将该事件对象传给那些方法，该事件对象则需要通过其getEvent方法来获得；
+
+四、事件委托
+因为冒泡机制，比如既然点击子元素，也会触发父元素的点击事件，
+那我们完全可以将子元素的事件要做的事写到父元素的事件里，
+也就是将子元素的事件处理程序写到父元素的事件处理程序中，这就是事件委托；
+利用事件委托，只指定一个事件处理程序，就可以管理某一个类型的所有事件；例如：
+复制代码
+var myLinks=document.getElementById('my-links');
+myHandlers=function(event){
+    event=EventUtil.getEvent(event);
+    var target=EventUtil.getTarget(event);
+
+    switch(target.id){
+        case 'item-1':
+            location.href='http://www.cnblogs.com/lazychen/';
+            break;
+        case 'item-2':
+            document.title='event';
+            break;
+        case 'item-3':
+            console.log('hi');
+            break;
+    }
+};
+EventUtil.addHandler(myLinks,'click',myHandlers);
+点击任何一个 li ，该点击事件依然会冒泡到父元素 ul 上，所以直接将点击 li 后要做的事写到了父元素的点击事件里；

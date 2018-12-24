@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    li {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <ul id="ul1">
+    <li>111</li>
+    <li>222</li>
+    <li>333</li>
+    <li>444</li>
+  </ul>
+  <script>
+    // window.onload = function () {
+    //   var oUl = document.getElementById("ul1");
+    //   var aLi = oUl.getElementsByTagName('li');
+    //   for (var i = 0; i < aLi.length; i++) {
+    //     aLi[i].onclick = function () {
+    //       alert(123);
+    //     }
+    //   }
+    // }
+    //普通方式。需要操作多次dom,首先要找到ul，然后遍历li，然后点击li的时候，
+    //又要找一次目标的li的位置，才能执行最后的操作，每次点击都要找一次li
+    //---------------------------------------------------------分割线
+    window.onload = function () {
+      var oUl = document.getElementById("ul1");
+      oUl.onclick = function (ev) {
+        var ev = ev || window.event;
+        var target = ev.target || ev.srcElement;
+        if (target.nodeName.toLowerCase() == 'li') {
+          alert(123);
+          alert(target.innerHTML);
+        }
+      }
+    }
+    //这样改下就只有点击li会触发事件了，且每次只执行一次dom操作，如果li数量很多的话，将大大减少dom的操作，优化的性能可想而知！
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+<meta charset="UTF-8">
+
+<head>
+  <meta charset="gbk">
+  <title>事实证明cssText在多数浏览器中性能较高</title>
+</head>
+
+<body>
+  <div id="container">
+    <input type="button" value="冒泡" id="test1" /> ||
+    <input type="button" value="捕获" id="test2" />
+  </div>
+  <script>
+    var container = document.getElementById("container");
+    var test1 = document.getElementById("test1");
+    var test2 = document.getElementById("test2");
+    //#region  事件冒泡测试
+    container.onclick = function () {
+      console.log("container");
+    }
+    test1.onclick = function () {
+      console.log("冒泡");
+    }
+    //冒泡:当前点击事件最先执行，之后一直向上传递
+    //#endregion
+
+    //#region  事件捕获测试
+    // container.addEventListener("click", function () {
+    //   console.log("container");
+    // }, true);
+    // test2.addEventListener("click", function () {
+    //   console.log("捕获");
+    // }, true);
+    // 捕获:从window对象层层向下传递
+    //#endregion
+  </script>
+</body>
+
+</html>
