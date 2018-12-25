@@ -35,17 +35,30 @@
   <p class="color-picker"></p>
 
   <script>
+    //重构后代码
     var list = document.querySelectorAll("li");
-    for (var i = 0, len = list.length; i < len; i++) {
-      list[i].onclick = function (e) {
-        var t = e.target;
-        var c = t.style.backgroundColor;
-        var p = document.getElementsByClassName("color-picker")[0]
-        p.innerHTML = c;
+    var ul = document.querySelector(".palette");
+    var p = document.getElementsByClassName("color-picker")[0]
+    ul.onclick = function (e) {
+      if (e.target.nodeName && e.target.nodeName.toUpperCase() == "LI") {
+        p.innerHTML = e.target.style.backgroundColor;
         p.style.color = "white";
-        p.style.backgroundColor = c;
+        p.style.backgroundColor = e.target.style.backgroundColor;
       }
     }
+
+    //重构前
+    // var list = document.querySelectorAll("li");
+    // for (var i = 0, len = list.length; i < len; i++) {
+    //   list[i].onclick = function (e) {
+    //     var t = e.target;
+    //     var c = t.style.backgroundColor;
+    //     
+    //     p.innerHTML = c;
+    //     p.style.color = "white";
+    //     p.style.backgroundColor = c;
+    //   }
+    // }
   </script>
 </body>
 
