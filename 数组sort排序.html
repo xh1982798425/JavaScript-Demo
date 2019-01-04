@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    //5 10 40 25 1000 1         
+    function sortNumber(a, b) {
+      return b - a  //b-a从高到低    a-b从低到高
+    }
+
+    var arr = new Array(6)
+    arr[0] = "10"
+    arr[1] = "5"
+    arr[2] = "40"
+    arr[3] = "25"
+    arr[4] = "1000"
+    arr[5] = "1"
+
+    document.write(arr + "<br />")
+    document.write(arr.sort(sortNumber))</script>
+</body>
+
+</html>

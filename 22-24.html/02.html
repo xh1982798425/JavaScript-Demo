@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+</head>
+
+<body>
+  <div>
+    <label>String A:
+      <input id="radio-a" type="radio" checked="true" name="str-obj" value="a" />
+    </label>
+    <textarea id="str-a"></textarea>
+    <label>String B: <input id="radio-b" type="radio" name="str-obj" value="b" />
+    </label>
+    <textarea id="str-b"></textarea>
+    <label>Num A：<input id="num-a" type="number" value="0" /></label>
+    <label>Num B：<input id="num-b" type="number" value="1" /></label>
+  </div>
+  <div id="container">
+    <button>Length</button>
+    <button>CharAt</button>
+    <button>Concat</button>
+    <button>IndexOf</button>
+    <button>lastIndexOf</button>
+    <button>Slice</button>
+    <button>当前选中输入框的行数</button>
+    <button>Substr</button>
+    <button>把所选输入框中的内容全部转为大写</button>
+    <button>把所选输入框中的内容全部转为小写</button>
+    <button>把所选输入框中内容的半角空格全部去除</button>
+    <button>把所选输入框中内容的a全部替换成另外一个输入框中的内容</button>
+  </div>
+  <p id="result"></p>
+  <script>
+    var check, str, texta, textb, str1, str2;
+    var result = document.getElementById('result');
+    var container = document.getElementById('container');
+    container.onclick = function (e) {
+      check = document.querySelector("input[type='radio']:checked") //当前选中的radio
+      str1 = document.getElementById("str-a").value;
+      str2 = document.getElementById("str-b").value;
+      texta = Number(document.getElementById('num-a').value) //文本框1的值
+      textb = Number(document.getElementById('num-b').value) //文本框2的值
+      str = check.value == 'a' ? str1 : str2;//根据选中的radio赋值
+      var target = e.target;
+      if (target.tagName && target.tagName == 'BUTTON')
+      {
+        switch (target.textContent)
+        {
+          case 'Length':
+            result.innerHTML = str.length;
+            break;
+          case 'CharAt':
+            result.innerHTML = str.charAt(2);
+            break;
+          case 'Concat':
+            result.innerHTML = str1.concat(str2);
+            break;
+          case 'IndexOf':
+            result.innerHTML = str1.indexOf(str2);
+            break;
+          case 'lastIndexOf':
+            result.innerHTML = str2.lastIndexOf(str1);
+            break;
+          case 'Slice':
+            result.innerHTML = str.slice(texta, textb);
+            break;
+          case '当前选中输入框的行数':
+            break;
+          case 'Substr':
+            result.innerHTML = str.substr(texta, textb);
+            break;
+          case '把所选输入框中的内容全部转为小写':
+            result.innerHTML = str.toLowerCase();
+            break;
+          case '把所选输入框中的内容全部转为大写':
+            result.innerHTML = str.toUpperCase();
+            break;
+          case '把所选输入框中内容的半角空格全部去除':
+            result.innerHTML = str.replace(/\s*/g, "");
+            break;
+          case '把所选输入框中内容的a全部替换成另外一个输入框中的内容':
+            result.innerHTML = str.replace(/a/g, check.value != 'a' ? str1 : str2);
+            break;
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>
